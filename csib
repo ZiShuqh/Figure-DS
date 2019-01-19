@@ -1,0 +1,64 @@
+https://github.com/dhalperi/linux-80211n-csitool-supplementary/issues/88
+
+
+sudo ifconfig wlan0 down
+sudo iwconfig wlan0 mode monitor 
+sudo ifconfig wlan0 up 
+sudo iw wlan0 set channel 64 HT20
+sudo ifconfig wlan0 up
+sudo linux-80211n-csitool-supplementary/netlink/log_to_file log1.dat
+
+
+sudo modprobe iwlwifi connector_log=0x1
+
+sudo modprobe -r iwldvm iwlwifi mac80211
+
+sudo iwlist mon0 channel
+sudo iwlist wlan0 channel
+
+
+
+
+echo iface wlan0 inet manual | sudo tee -a /etc/network/interfaces
+sudo restart network-manager
+On Receiver:
+
+sudo ip link set wlan0 down
+sudo ip link set wlan0 type monitor
+sudo ip link set wlan0 up
+sudo iw wlan0 set channel 64 HT20
+sudo ifconfig wlan0 up
+sudo linux-80211n-csitool-supplementary/netlink/log_to_file log1.dat
+
+On transmitter:
+cd linux-80211n-csitool-supplementary/injection
+./setup_injection.sh 64 HT20
+Output was:
+"command failed: Device or resource busy (-16)"
+output of iwconfig
+eth0 no wireless extensions.
+
+mon0 IEEE 802.11abgn Mode:Monitor Tx-Power=15 dBm
+Retry short limit:7 RTS thr:off Fragment thr:off
+Power Management:off
+
+wlan0 IEEE 802.11abgn ESSID:off/any
+Mode:Managed Access Point: Not-Associated Tx-Power=15 dBm
+Retry short limit:7 RTS thr:off Fragment thr:off
+Power Management:off
+
+lo no wireless extensions.
+
+muneeb@Ultrabook:$ sudo ifconfig wlan0 down
+muneeb@Ultrabook:$ sudo iw mon0 set channel 64 HT20
+muneeb@Ultrabook:~$ sudo ifconfig mon0 up
+sudo echo 0x4101 |sudo tee /sys/kernel/debug/ieee80211/phy0/iwlwifi/iwldvm/debug/monitor_tx_rate
+sudo ./random_packets 5 100 1
+
+
+
+
+cd linux-80211n-csitool-supplementary/netlink
+gcc log_to_server.c -o log_to_server
+sudo ./log_to_server 192.168.5.10 8090
+
